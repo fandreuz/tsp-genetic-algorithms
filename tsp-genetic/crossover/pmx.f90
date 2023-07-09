@@ -1,4 +1,4 @@
-module crossover
+module pmx
    use utils
 
    public :: partially_mapped_crossover
@@ -43,4 +43,4 @@ contains
          end if
       end do
    end function
-end module crossover
+end module pmx
