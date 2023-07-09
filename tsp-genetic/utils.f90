@@ -28,7 +28,6 @@ contains
    function wrap_to_top(x, top) result(y)
       integer :: x, top, y
 
-      write(*,*) x, top
       if (x > top) then
          y = modulo(x, top)
       else

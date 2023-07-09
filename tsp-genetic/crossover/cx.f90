@@ -15,10 +15,8 @@ contains
 
    function cycle_crossover_child(parent1, parent2) result(child)
       integer, dimension(:) :: parent1
-      integer, dimension(size(parent1)) :: parent2
-      integer, dimension(size(parent1)) :: child
+      integer, dimension(size(parent1)) :: parent2, child, iparent1
       logical, dimension(size(child)) :: child_bitmap
-      integer, dimension(size(parent1)) :: iparent1
       integer target
 
       child_bitmap(:) = .false.

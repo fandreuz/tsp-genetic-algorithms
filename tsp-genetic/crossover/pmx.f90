@@ -7,8 +7,8 @@ contains
    subroutine partially_mapped_crossover(parent1, parent2, child1, child2, rnd1, rnd2)
       integer, dimension(:), intent(in) :: parent1
       integer, dimension(size(parent1)), intent(in) :: parent2
+      real, intent(in) :: rnd1, rnd2
       integer, dimension(size(parent1)), intent(out) :: child1, child2
-      real :: rnd
       integer, dimension(size(parent1)) :: iparent1, iparent2
       integer cut_start, cut_end, tmp
 
@@ -30,9 +30,7 @@ contains
 
    function partially_mapped_crossover_child(parent1, parent2, iparent1, iparent2, cut_start, cut_end) result(child)
       integer, dimension(:) :: parent1
-      integer, dimension(size(parent1)) :: parent2
-      integer, dimension(size(parent1)) :: child
-      integer, dimension(size(parent1)) :: iparent1, iparent2
+      integer, dimension(size(parent1)) :: parent2, child, iparent1, iparent2
       integer cut_start, cut_end, target
 
       child(:) = parent2(:)
