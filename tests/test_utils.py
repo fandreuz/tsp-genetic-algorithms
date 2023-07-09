@@ -8,15 +8,15 @@ import numpy as np
 
 
 def test_inverse_array():
-    input = np.empty(5, dtype=int, order="F")
-    input[0] = 2
-    input[1] = 4
-    input[2] = 3
-    input[3] = 0
-    input[4] = 1
-
+    input = np.array((2, 4, 3, 1), order="F")
     output = utils.inverse_array(input)
-    assert (output == (3, 4, 0, 2, 1)).all()
+    assert (output == (4, 1, 3, 2)).all()
+
+
+def test_inverse_array2():
+    input = np.array((1, 4, 2, 3, 6, 5, 7, 8), order="F")
+    output = utils.inverse_array(input)
+    assert (output == (1, 3, 4, 2, 6, 5, 7, 8)).all()
 
 
 def test_out_of_bounds():
