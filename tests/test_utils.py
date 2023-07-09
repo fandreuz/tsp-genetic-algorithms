@@ -25,3 +25,12 @@ def test_out_of_bounds():
     assert not utils.out_of_bounds(3, 3, 5)
     assert not utils.out_of_bounds(3, 4, 5)
     assert not utils.out_of_bounds(3, 5, 5)
+
+
+def test_wrap():
+    assert utils.wrap_to_top(1, 4) == 1
+    assert utils.wrap_to_top(2, 4) == 2
+    assert utils.wrap_to_top(3, 4) == 3
+    assert utils.wrap_to_top(4, 4) == 4
+    assert utils.wrap_to_top(5, 4) == 1
+    assert utils.wrap_to_top(6, 4) == 2

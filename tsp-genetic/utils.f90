@@ -24,4 +24,15 @@ contains
 
       result = small <= x .and. x <= big
    end function
+
+   function wrap_to_top(x, top) result(y)
+      integer :: x, top, y
+
+      write(*,*) x, top
+      if (x > top) then
+         y = modulo(x, top)
+      else
+         y = x
+      end if
+   end function
 end module utils
