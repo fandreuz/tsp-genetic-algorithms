@@ -3,20 +3,23 @@ module pmx
 
    public :: partially_mapped_crossover
    private :: partially_mapped_crossover_child
-
-   integer cut_size
 contains
-   subroutine partially_mapped_crossover(parent1, parent2, child1, child2, rnd)
+   subroutine partially_mapped_crossover(parent1, parent2, child1, child2, rnd1, rnd2)
       integer, dimension(:), intent(in) :: parent1
       integer, dimension(size(parent1)), intent(in) :: parent2
       integer, dimension(size(parent1)), intent(out) :: child1, child2
       real :: rnd
       integer, dimension(size(parent1)) :: iparent1, iparent2
-      integer cut_start, cut_end
+      integer cut_start, cut_end, tmp
 
       call random_number(cut_position_01)
-      cut_start = floor(rnd * size(parent1)) + 1
-      cut_end = min(cut_start+cut_size - 1, size(parent1))
+      cut_start = floor(rnd1 * size(parent1)) + 1
+      cut_end = floor(rnd2 * size(parent1)) + 1
+      if (cut_end < cut_start) then
+         tmp = cut_start
+         cut_start = cut_end
+         cut_end = tmp
+      end if
 
       iparent1 = inverse_array(parent1)
       iparent2 = inverse_array(parent2)
