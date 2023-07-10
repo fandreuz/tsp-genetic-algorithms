@@ -5,4 +5,5 @@ compile:
 		tsp-genetic/utils.f90 \
 		tsp-genetic/crossover/pmx.f90 \
 		tsp-genetic/crossover/cx.f90 \
-		tsp-genetic/crossover/ox.f90
+		tsp-genetic/crossover/ox.f90 \
+		tsp-genetic/crossover/cx2.f90
