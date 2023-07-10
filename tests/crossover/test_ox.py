@@ -6,6 +6,17 @@ from tsp_genetic import ox
 
 import numpy as np
 
+from test_crossover import same_length, not_repeated, random_paths
+
+
+def callback(parent1, parent2):
+    return ox.order_crossover(parent1, parent2, 3 / len(parent1), 5 / len(parent1))
+
+
+test_same_length = same_length(callback)
+
+test_not_repeated = not_repeated(callback)
+
 
 def test_ox():
     parent1 = np.array((3, 4, 8, 2, 7, 1, 6, 5), order="F")

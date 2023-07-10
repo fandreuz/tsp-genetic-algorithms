@@ -6,6 +6,19 @@ from tsp_genetic import pmx
 
 import numpy as np
 
+from test_crossover import same_length, not_repeated, random_paths
+
+
+def callback(parent1, parent2):
+    return pmx.partially_mapped_crossover(
+        parent1, parent2, 3 / len(parent1), 5 / len(parent1)
+    )
+
+
+test_same_length = same_length(callback)
+
+test_not_repeated = not_repeated(callback)
+
 
 def test_pmx():
     parent1 = np.array((1, 2, 5, 6, 4, 3, 8, 7), order="F")
