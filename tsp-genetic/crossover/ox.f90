@@ -11,7 +11,6 @@ contains
       integer, dimension(size(parent1)), intent(out) :: child1, child2
       integer cut_start, cut_end, tmp
 
-      call random_number(cut_position_01)
       cut_start = floor(rnd1 * size(parent1)) + 1
       cut_end = floor(rnd2 * size(parent1)) + 1
       if (cut_end < cut_start) then

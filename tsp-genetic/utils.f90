@@ -3,6 +3,7 @@ contains
    function inverse_array(array) result(inverted)
       integer, dimension(:) :: array
       integer, dimension(size(array)) :: inverted
+      integer :: i
 
       do i=1, size(array)
          ! assume the smallest value is one

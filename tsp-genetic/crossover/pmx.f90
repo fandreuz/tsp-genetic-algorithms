@@ -12,7 +12,6 @@ contains
       integer, dimension(size(parent1)) :: iparent1, iparent2
       integer cut_start, cut_end, tmp
 
-      call random_number(cut_position_01)
       cut_start = floor(rnd1 * size(parent1)) + 1
       cut_end = floor(rnd2 * size(parent1)) + 1
       if (cut_end < cut_start) then
@@ -31,7 +30,7 @@ contains
    function partially_mapped_crossover_child(parent1, parent2, iparent1, iparent2, cut_start, cut_end) result(child)
       integer, dimension(:) :: parent1
       integer, dimension(size(parent1)) :: parent2, child, iparent1, iparent2
-      integer cut_start, cut_end, target
+      integer cut_start, cut_end, target, i
 
       child(:) = parent2(:)
       child(cut_start:cut_end) = parent1(cut_start:cut_end)
