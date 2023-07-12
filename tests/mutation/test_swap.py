@@ -3,13 +3,13 @@ from pathlib import Path
 import numpy as np
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
-from tsp_genetic import swap
+from tsp_genetic import swap_mutation
 
 from test_mutation import same_length, not_repeated, random_paths
 
 
 def callback(chromosome):
-    return swap.swap_positions(chromosome, 1, 2)
+    return swap_mutation.swap(chromosome, 1, 2)
 
 
 test_same_length = same_length(callback)
