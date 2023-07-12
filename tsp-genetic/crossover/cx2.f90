@@ -15,18 +15,7 @@ contains
       iparent2 = inverse_array(parent2)
 
       parent_bitmap(:) = .false.
-      child_idx = 1
       target = 1
-      ! prevent loops
-      do while (target < size(parent1) .and. parent1(child_idx) == parent2(child_idx))
-         child1(child_idx) = parent1(target)
-         child2(child_idx) = parent1(target)
-         parent_bitmap(target) = .true.
-
-         target = target + 1
-         child_idx = child_idx + 1
-      end do
-
       do child_idx=child_idx, size(parent1)
          if (parent_bitmap(target)) then
             do target=1, size(parent1)
