@@ -1,18 +1,12 @@
-module cx2
-   use utils
-
+module cx2_original
    public :: cycle_crossover2
 contains
    subroutine cycle_crossover2(parent1, parent2, child1, child2)
       integer, dimension(:), intent(in) :: parent1
       integer, dimension(size(parent1)), intent(in) :: parent2
       integer, dimension(size(parent1)), intent(out) :: child1, child2
-      integer, dimension(size(parent1)) :: iparent1, iparent2
       logical, dimension(size(parent1)) :: parent_bitmap
-      integer :: target, child_idx
-
-      iparent1 = inverse_array(parent1)
-      iparent2 = inverse_array(parent2)
+      integer :: target, child_idx, ind1(1), ind2(1)
 
       parent_bitmap(:) = .false.
       child_idx = 1
@@ -37,11 +31,14 @@ contains
          end if
 
          child1(child_idx) = parent2(target)
-         child2(child_idx) = parent2(iparent1(parent2(iparent1(child1(child_idx)))))
+
+         ind1 = findloc(parent1, child1(child_idx))
+         ind2 = findloc(parent1, parent2(ind1(1)))
+         child2(child_idx) = parent2(ind2(1))
          parent_bitmap(target) = .true.
 
-         target = iparent1(child2(child_idx))
+         ind1 = findloc(parent1, child2(child_idx))
+         target = ind1(1)
       end do
    end subroutine
-end module cx2
-
+end module cx2_original
