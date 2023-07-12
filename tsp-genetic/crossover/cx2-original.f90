@@ -10,7 +10,7 @@ contains
 
       parent_bitmap(:) = .false.
       target = 1
-      do child_idx=child_idx, size(parent1)
+      do child_idx=1, size(parent1)
          if (parent_bitmap(target)) then
             do target=1, size(parent1)
                if (.not. parent_bitmap(target)) then
