@@ -45,3 +45,7 @@ def print_header():
     _print_no_newline(f"{'Avg'.ljust(_stats_pad)}")
     _separator()
     print(f"{'Optimum/Min'.ljust(_stats_pad)}")
+
+
+def print_mutations(mutations_count):
+    print(f"N. of mutations: {mutations_count}")

@@ -29,6 +29,9 @@ parser.add_argument(
     help="Generations distance between two population inspection messages",
     default=100,
 )
+parser.add_argument(
+    "-m", "--mutation", type=float, help="Mutation probability", default=0.1
+)
 
 args = parser.parse_args()
 
@@ -39,6 +42,7 @@ configuration = Configuration(
     population_size=args.population,
     elite_size=floor(args.elite * args.population),
     n_generations=args.generations,
+    mutation_probability=args.mutation,
     print_every=args.print_every,
 )
 print(f"Configuration: {configuration}")

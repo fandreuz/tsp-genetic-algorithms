@@ -8,6 +8,9 @@ class Configuration:
     elite_size: int
     n_generations: int
 
+    # Evolution
+    mutation_probability: float
+
     # Inspection
     print_every: int
 
@@ -22,6 +25,10 @@ class Configuration:
             raise ValueError("Number of matings per generation should be even")
         if self.n_generations <= 0:
             raise ValueError(f"Number of generations: {self.n_generations} > 0")
+        if not 0 <= self.mutation_probability <= 1:
+            raise ValueError(
+                f"Mutation probability: 0 <= {self.mutation_probability} <= 1"
+            )
 
     @property
     def mating_size(self) -> int:
