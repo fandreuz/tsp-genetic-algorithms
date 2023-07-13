@@ -23,6 +23,12 @@ parser.add_argument(
     help="Size of the inter-generational elite",
     default=0.1,
 )
+parser.add_argument(
+    "--print-every",
+    type=int,
+    help="Generations distance between two population inspection messages",
+    default=100,
+)
 
 args = parser.parse_args()
 
@@ -33,6 +39,7 @@ configuration = Configuration(
     population_size=args.population,
     elite_size=floor(args.elite * args.population),
     n_generations=args.generations,
+    print_every=args.print_every,
 )
 print(f"Configuration: {configuration}")
 

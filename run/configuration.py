@@ -3,9 +3,13 @@ from dataclasses import dataclass
 
 @dataclass
 class Configuration:
+    # Population
     population_size: int
     elite_size: int
     n_generations: int
+
+    # Inspection
+    print_every: int
 
     def __post_init__(self):
         if self.population_size <= 0:

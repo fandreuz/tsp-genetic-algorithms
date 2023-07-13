@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 from configuration import Configuration
+from inspection import print_header, print_inspection_message
 
 sys.path.append(str(Path(__file__).parent.parent))
 from tsp_genetic import utils, problem as genetic_problem, cx2
@@ -26,8 +27,19 @@ def driver(problem: Problem, configuration: Configuration):
     population = _init_population(problem.n_nodes, configuration.population_size)
     next_population = np.empty_like(population, order="F")
 
+    optimum = _compute_fitness(problem.cost_matrix, problem.optimal_tour[None])[0]
+    if configuration.print_every > 0:
+        print_header()
+
     for current_generation in range(configuration.n_generations - 1):
         fitness = _compute_fitness(problem.cost_matrix, population)
+
+        if current_generation % configuration.print_every == 0:
+            print_inspection_message(
+                current_generation=current_generation,
+                fitness=fitness,
+                optimum=optimum,
+            )
 
         ranks = np.argsort(fitness)
         next_population[: configuration.elite_size] = population[
@@ -50,5 +62,4 @@ def driver(problem: Problem, configuration: Configuration):
 
     fitness = _compute_fitness(problem.cost_matrix, population)
     best = np.argmin(fitness)
-    optimum = _compute_fitness(problem.cost_matrix, problem.optimal_tour[None])[0]
     return population[best], fitness[best], optimum
