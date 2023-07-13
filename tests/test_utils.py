@@ -34,3 +34,9 @@ def test_wrap():
     assert utils.wrap_to_top(4, 4) == 4
     assert utils.wrap_to_top(5, 4) == 1
     assert utils.wrap_to_top(6, 4) == 2
+
+
+def test_scramble():
+    for _ in range(10):
+        output = utils.scramble(20)
+        assert (sorted(output) == np.arange(1, 21)).all()

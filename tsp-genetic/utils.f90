@@ -35,4 +35,26 @@ contains
          y = x
       end if
    end function
+
+   ! inspired by programming-idioms.org, slightly modified
+   subroutine scramble(array, n_values)
+      integer, intent(in) :: n_values
+      integer, dimension(n_values), intent(out) :: array
+      real, dimension(2 * n_values) :: rnd
+      integer :: i, j, k, itemp
+
+      do i = 1, n_values
+         array(i) = i
+      end do
+
+      call random_number(rnd)
+      do k = 1, 2
+         do i = 1, n_values
+            j = 1 + floor(n_values * rnd((k - 1) * n_values + i))
+            itemp = array(j)
+            array(j) = array(i)
+            array(i) = itemp
+         end do
+      end do
+   end subroutine scramble
 end module utils
