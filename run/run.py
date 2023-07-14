@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 
 from evolve import driver
-from configuration import Configuration
+from configuration import Configuration, CrossoverStrategy
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
 from load import build_problem
@@ -32,6 +32,14 @@ parser.add_argument(
 parser.add_argument(
     "-m", "--mutation", type=float, help="Mutation probability", default=0.1
 )
+parser.add_argument(
+    "-s",
+    "--crossover-strategy",
+    type=int,
+    choices=[e.value for e in CrossoverStrategy],
+    help="Crossover strategy",
+    default=CrossoverStrategy.ALL_IN_ORDER.value,
+)
 
 args = parser.parse_args()
 
@@ -44,6 +52,7 @@ configuration = Configuration(
     n_generations=args.generations,
     mutation_probability=args.mutation,
     print_every=args.print_every,
+    crossover_strategy=CrossoverStrategy(args.crossover_strategy),
 )
 print(f"Configuration: {configuration}")
 

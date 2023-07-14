@@ -2,7 +2,7 @@ import numpy as np
 import sys
 from pathlib import Path
 
-from configuration import Configuration
+from configuration import Configuration, CrossoverStrategy
 from inspection import print_header, print_inspection_message, print_mutations
 
 sys.path.append(str(Path(__file__).parent.parent))
@@ -34,30 +34,42 @@ def _elitism(
     next_population[: configuration.elite_size] = population[: configuration.elite_size]
 
 
+def _select_mating_pairs(
+    configuration: Configuration, mating_indexes_choice: np.ndarray, mating_size: int
+):
+    if configuration.crossover_strategy == CrossoverStrategy.ALL_IN_ORDER:
+        parent_indexes = mating_indexes_choice
+        if mating_size > len(parent_indexes):
+            return np.concatenate((parent_indexes, (0,)))
+    elif configuration.crossover_strategy == CrossoverStrategy.ALL_RANDOM_PAIRS:
+        return rnd.permutation(np.concatenate((mating_indexes_choice, (0,))))
+    elif configuration.crossover_strategy == CrossoverStrategy.RANDOM_PAIRS:
+        return rnd.choice(mating_indexes_choice, mating_size)
+    else:
+        raise ValueError(
+            f"Unexpected crossover strategy: {configuration.crossover_strategy}"
+        )
+
+
 def _mate(
-    population: np.ndarray,
+    mating_population: np.ndarray,
     next_population: np.ndarray,
-    mating_indexes_choice: np.ndarray,
     configuration: Configuration,
 ):
-    mating_size = configuration.mating_size + configuration.skip_last_child
-    parent_indexes = rnd.choice(mating_indexes_choice, mating_size)
-    for i in range(0, mating_size - 2, 2):
-        parent1 = population[parent_indexes[i]]
-        parent2 = population[parent_indexes[i + 1]]
+    for i in range(0, len(mating_population) - 2, 2):
+        p1 = mating_population[i]
+        p2 = mating_population[i + 1]
         (
             next_population[configuration.elite_size + i],
             next_population[configuration.elite_size + i + 1],
-        ) = cx2.cycle_crossover2(parent1, parent2)
+        ) = cx2.cycle_crossover2(p1, p2)
 
-    parent1 = population[parent_indexes[-2]]
-    parent2 = population[parent_indexes[-1]]
+    p1 = mating_population[-2]
+    p2 = mating_population[-1]
     if configuration.skip_last_child:
-        next_population[-1], _ = cx2.cycle_crossover2(parent1, parent2)
+        next_population[-1], _ = cx2.cycle_crossover2(p1, p2)
     else:
-        next_population[-2], next_population[-1] = cx2.cycle_crossover2(
-            parent1, parent2
-        )
+        next_population[-2], next_population[-1] = cx2.cycle_crossover2(p1, p2)
 
 
 def _mutate(
@@ -93,6 +105,7 @@ def driver(problem: Problem, configuration: Configuration):
         print_header()
 
     mutations_count = 0
+    mating_size = configuration.mating_size + configuration.skip_last_child
 
     for current_generation in range(configuration.n_generations - 1):
         fitness = _compute_fitness(problem.cost_matrix, population)
@@ -111,10 +124,14 @@ def driver(problem: Problem, configuration: Configuration):
             configuration=configuration,
         )
 
-        _mate(
-            population=population,
-            next_population=next_population,
+        mating_pairs = _select_mating_pairs(
+            configuration=configuration,
             mating_indexes_choice=mating_indexes_choice,
+            mating_size=mating_size,
+        )
+        _mate(
+            mating_population=population[mating_pairs],
+            next_population=next_population,
             configuration=configuration,
         )
 
@@ -126,8 +143,19 @@ def driver(problem: Problem, configuration: Configuration):
 
         population, next_population = next_population, population
 
+    fitness = _compute_fitness(problem.cost_matrix, population)
+    current_generation = configuration.n_generations - 1
+    if current_generation % configuration.print_every == 0:
+        print_inspection_message(
+            current_generation=current_generation,
+            fitness=fitness,
+            optimum=optimum,
+        )
+
     print_mutations(mutations_count)
 
-    fitness = _compute_fitness(problem.cost_matrix, population)
     best = np.argmin(fitness)
+    best_n = np.count_nonzero(fitness == fitness[best])
+    print(f"Optimum: {best_n}/{configuration.population_size}")
+
     return population[best], fitness[best], optimum

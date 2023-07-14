@@ -1,4 +1,14 @@
 from dataclasses import dataclass, field
+from enum import Enum
+
+
+class CrossoverStrategy(Enum):
+    # All parents are mated in fitness order
+    ALL_IN_ORDER = 1
+    # All parents are mated in random pairs
+    ALL_RANDOM_PAIRS = 2
+    # Random pairs of parents
+    RANDOM_PAIRS = 3
 
 
 @dataclass
@@ -11,6 +21,7 @@ class Configuration:
 
     # Evolution
     mutation_probability: float
+    crossover_strategy: CrossoverStrategy
 
     # Inspection
     print_every: int
