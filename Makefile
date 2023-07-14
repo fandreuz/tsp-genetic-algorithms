@@ -13,9 +13,11 @@ SRC=tsp-genetic/utils.f90 \
 compile:
 	python3 -m numpy.f2py \
 		--f90flags="-fcheck=all -Wall -Wextra -fimplicit-none -fbacktrace" \
-		-c -m \
-		$(OUTPUT) $(SRC)
+		-c \
+		-m $(OUTPUT) \
+		$(SRC)
 fast:
 	python3 -m numpy.f2py \
-	 	-c -m \
-		$(OUTPUT) $(SRC)
+	 	-c \
+		-m $(OUTPUT) \
+		$(SRC)
