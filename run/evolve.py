@@ -40,8 +40,9 @@ def _mate(
     mating_indexes_choice: np.ndarray,
     configuration: Configuration,
 ):
-    parent_indexes = rnd.choice(mating_indexes_choice, configuration.mating_size)
-    for i in range(0, configuration.mating_size - 2, 2):
+    mating_size = configuration.mating_size + configuration.skip_last_child
+    parent_indexes = rnd.choice(mating_indexes_choice, mating_size)
+    for i in range(0, mating_size - 2, 2):
         parent1 = population[parent_indexes[i]]
         parent2 = population[parent_indexes[i + 1]]
         (
@@ -49,17 +50,14 @@ def _mate(
             next_population[configuration.elite_size + i + 1],
         ) = cx2.cycle_crossover2(parent1, parent2)
 
-    if configuration.mating_size % 2 == 0:
-        parent1 = population[parent_indexes[-2]]
-        parent2 = population[parent_indexes[-1]]
-        (
-            next_population[-1],
-            next_population[-2],
-        ) = cx2.cycle_crossover2(parent1, parent2)
-    else:
-        parent1 = population[parent_indexes[-1]]
-        parent2 = population[parent_indexes[0]]
+    parent1 = population[parent_indexes[-2]]
+    parent2 = population[parent_indexes[-1]]
+    if configuration.skip_last_child:
         next_population[-1], _ = cx2.cycle_crossover2(parent1, parent2)
+    else:
+        next_population[-2], next_population[-1] = cx2.cycle_crossover2(
+            parent1, parent2
+        )
 
 
 def _mutate(

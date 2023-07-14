@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -7,6 +7,7 @@ class Configuration:
     population_size: int
     elite_size: int
     n_generations: int
+    skip_last_child: bool = field(init=False)
 
     # Evolution
     mutation_probability: float
@@ -27,6 +28,8 @@ class Configuration:
             raise ValueError(
                 f"Mutation probability: 0 <= {self.mutation_probability} <= 1"
             )
+
+        self.skip_last_child = self.mating_size % 2 == 1
 
     @property
     def mating_size(self) -> int:
