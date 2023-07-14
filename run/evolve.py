@@ -53,14 +53,25 @@ def driver(problem: Problem, configuration: Configuration):
         ]
 
         parent_indexes = rnd.choice(mating_indexes_choice, configuration.mating_size)
-        for i in range(0, configuration.mating_size, 2):
+        for i in range(0, configuration.mating_size - 2, 2):
             parent1 = population[ranks[parent_indexes[i]]]
             parent2 = population[ranks[parent_indexes[i + 1]]]
-
             (
                 next_population[configuration.elite_size + i],
                 next_population[configuration.elite_size + i + 1],
             ) = cx2.cycle_crossover2(parent1, parent2)
+
+        if configuration.mating_size % 2 == 0:
+            parent1 = population[ranks[parent_indexes[-2]]]
+            parent2 = population[ranks[parent_indexes[-1]]]
+            (
+                next_population[-1],
+                next_population[-2],
+            ) = cx2.cycle_crossover2(parent1, parent2)
+        else:
+            parent1 = population[ranks[parent_indexes[-1]]]
+            parent2 = population[ranks[parent_indexes[0]]]
+            next_population[-1], _ = cx2.cycle_crossover2(parent1, parent2)
 
         mutations_bitmap = rnd.binomial(
             1, configuration.mutation_probability, configuration.population_size
