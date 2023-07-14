@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
+from crossover import Crossover
 
 
 class CrossoverStrategy(Enum):
@@ -22,6 +23,7 @@ class Configuration:
     # Evolution
     mutation_probability: float
     crossover_strategy: CrossoverStrategy
+    crossover: Crossover
 
     # Inspection
     print_every: int

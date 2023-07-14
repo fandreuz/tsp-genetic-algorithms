@@ -4,6 +4,7 @@ import sys
 
 from evolve import driver
 from configuration import Configuration, CrossoverStrategy
+from crossover import Crossover
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
 from load import build_problem
@@ -33,6 +34,14 @@ parser.add_argument(
     "-m", "--mutation", type=float, help="Mutation probability", default=0.1
 )
 parser.add_argument(
+    "-c",
+    "--crossover",
+    type=int,
+    choices=[e.value for e in Crossover],
+    help="Crossover",
+    default=Crossover.CX2.value,
+)
+parser.add_argument(
     "-s",
     "--crossover-strategy",
     type=int,
@@ -53,6 +62,7 @@ configuration = Configuration(
     mutation_probability=args.mutation,
     print_every=args.print_every,
     crossover_strategy=CrossoverStrategy(args.crossover_strategy),
+    crossover=Crossover(args.crossover),
 )
 print(f"Configuration: {configuration}")
 

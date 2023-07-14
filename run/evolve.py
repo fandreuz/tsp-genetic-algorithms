@@ -3,10 +3,11 @@ import sys
 from pathlib import Path
 
 from configuration import Configuration, CrossoverStrategy
+from crossover import crossover_functions, crossover_needs_2_rnd
 from inspection import print_header, print_inspection_message, print_mutations
 
 sys.path.append(str(Path(__file__).parent.parent))
-from tsp_genetic import utils, problem as genetic_problem, cx2, swap_mutation
+from tsp_genetic import utils, problem as genetic_problem, swap_mutation
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
 from problem import Problem
@@ -56,20 +57,33 @@ def _mate(
     next_population: np.ndarray,
     configuration: Configuration,
 ):
-    for i in range(0, len(mating_population) - 2, 2):
-        p1 = mating_population[i]
-        p2 = mating_population[i + 1]
+    M = len(mating_population)
+    M2 = M // 2
+
+    if configuration.crossover in crossover_needs_2_rnd:
+        additional_args = rnd.random(M).reshape(-1, 2)
+    else:
+        additional_args = [tuple() for _ in range(M2)]
+
+    crossover_function = crossover_functions[configuration.crossover]
+    for i in range(M2 - 1):
+        i2 = i * 2
+
+        p1 = mating_population[i2]
+        p2 = mating_population[i2 + 1]
         (
-            next_population[configuration.elite_size + i],
-            next_population[configuration.elite_size + i + 1],
-        ) = cx2.cycle_crossover2(p1, p2)
+            next_population[configuration.elite_size + i2],
+            next_population[configuration.elite_size + i2 + 1],
+        ) = crossover_function(p1, p2, *(additional_args[i]))
 
     p1 = mating_population[-2]
     p2 = mating_population[-1]
     if configuration.skip_last_child:
-        next_population[-1], _ = cx2.cycle_crossover2(p1, p2)
+        next_population[-1], _ = crossover_function(p1, p2, *(additional_args[-1]))
     else:
-        next_population[-2], next_population[-1] = cx2.cycle_crossover2(p1, p2)
+        next_population[-2], next_population[-1] = crossover_function(
+            p1, p2, *(additional_args[-1])
+        )
 
 
 def _mutate(
