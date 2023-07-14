@@ -21,8 +21,6 @@ class Configuration:
             raise ValueError(f"Elite size: {self.elite_size} >= 0")
         if self.elite_size >= self.population_size:
             raise ValueError(f"Elite size: {self.elite_size} < {self.population_size}")
-        if self.mating_size % 2 != 0:
-            raise ValueError("Number of matings per generation should be even")
         if self.n_generations <= 0:
             raise ValueError(f"Number of generations: {self.n_generations} > 0")
         if not 0 <= self.mutation_probability <= 1:
