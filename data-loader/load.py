@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 from itertools import dropwhile
 
-from problem import Problem
+from problem import Problem, toy_problem
 
 data_directory = Path(__file__).parent.parent / "data"
 
@@ -38,6 +38,9 @@ def _extract_optimal_tour(name: str) -> np.ndarray:
 
 
 def build_problem(name: str) -> Problem:
+    if name == "toy":
+        return toy_problem
+
     problem_name, cost_matrix = _extract_problem_structure(name)
     optimal_tour = _extract_optimal_tour(name)
     return Problem(
