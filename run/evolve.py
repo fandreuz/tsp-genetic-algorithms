@@ -24,8 +24,67 @@ def _compute_fitness(cost_matrix: np.ndarray, population: np.ndarray) -> np.ndar
     return genetic_problem.fitness(cost_matrix, np.atleast_2d(population))
 
 
+def _elitism(
+    population: np.ndarray,
+    next_population: np.ndarray,
+    fitness: np.ndarray,
+    configuration: Configuration,
+):
+    population = population[np.argsort(fitness)]
+    next_population[: configuration.elite_size] = population[: configuration.elite_size]
+
+
+def _mate(
+    population: np.ndarray,
+    next_population: np.ndarray,
+    mating_indexes_choice: np.ndarray,
+    configuration: Configuration,
+):
+    parent_indexes = rnd.choice(mating_indexes_choice, configuration.mating_size)
+    for i in range(0, configuration.mating_size - 2, 2):
+        parent1 = population[parent_indexes[i]]
+        parent2 = population[parent_indexes[i + 1]]
+        (
+            next_population[configuration.elite_size + i],
+            next_population[configuration.elite_size + i + 1],
+        ) = cx2.cycle_crossover2(parent1, parent2)
+
+    if configuration.mating_size % 2 == 0:
+        parent1 = population[parent_indexes[-2]]
+        parent2 = population[parent_indexes[-1]]
+        (
+            next_population[-1],
+            next_population[-2],
+        ) = cx2.cycle_crossover2(parent1, parent2)
+    else:
+        parent1 = population[parent_indexes[-1]]
+        parent2 = population[parent_indexes[0]]
+        next_population[-1], _ = cx2.cycle_crossover2(parent1, parent2)
+
+
+def _mutate(
+    next_population: np.ndarray,
+    configuration: Configuration,
+    mutation_indexes_choice: np.ndarray,
+):
+    mutations_bitmap = rnd.binomial(
+        1, configuration.mutation_probability, configuration.population_size
+    ).astype(bool)
+    n_mutations = np.sum(mutations_bitmap)
+
+    swap_indices = rnd.choice(mutation_indexes_choice, size=(n_mutations, 2))
+    for idx, population_idx in enumerate(np.nonzero(mutations_bitmap)[0]):
+        next_population[population_idx] = swap_mutation.swap(
+            next_population[population_idx], *swap_indices[idx]
+        )
+
+    return n_mutations
+
+
 def driver(problem: Problem, configuration: Configuration):
-    mating_indexes_choice = list(range(configuration.mating_size))
+    mating_indexes_choice = list(
+        range(configuration.elite_size, configuration.population_size)
+    )
     mutation_indexes_choice = list(range(1, problem.n_nodes + 1))
 
     population = _init_population(problem.n_nodes, configuration.population_size)
@@ -47,43 +106,25 @@ def driver(problem: Problem, configuration: Configuration):
                 optimum=optimum,
             )
 
-        ranks = np.argsort(fitness)
-        next_population[: configuration.elite_size] = population[
-            ranks[: configuration.elite_size]
-        ]
+        _elitism(
+            population=population,
+            next_population=next_population,
+            fitness=fitness,
+            configuration=configuration,
+        )
 
-        parent_indexes = rnd.choice(mating_indexes_choice, configuration.mating_size)
-        for i in range(0, configuration.mating_size - 2, 2):
-            parent1 = population[ranks[parent_indexes[i]]]
-            parent2 = population[ranks[parent_indexes[i + 1]]]
-            (
-                next_population[configuration.elite_size + i],
-                next_population[configuration.elite_size + i + 1],
-            ) = cx2.cycle_crossover2(parent1, parent2)
+        _mate(
+            population=population,
+            next_population=next_population,
+            mating_indexes_choice=mating_indexes_choice,
+            configuration=configuration,
+        )
 
-        if configuration.mating_size % 2 == 0:
-            parent1 = population[ranks[parent_indexes[-2]]]
-            parent2 = population[ranks[parent_indexes[-1]]]
-            (
-                next_population[-1],
-                next_population[-2],
-            ) = cx2.cycle_crossover2(parent1, parent2)
-        else:
-            parent1 = population[ranks[parent_indexes[-1]]]
-            parent2 = population[ranks[parent_indexes[0]]]
-            next_population[-1], _ = cx2.cycle_crossover2(parent1, parent2)
-
-        mutations_bitmap = rnd.binomial(
-            1, configuration.mutation_probability, configuration.population_size
-        ).astype(bool)
-        n_mutations = np.sum(mutations_bitmap)
-        mutations_count += n_mutations
-
-        swap_indices = rnd.choice(mutation_indexes_choice, size=(n_mutations, 2))
-        for idx, population_idx in enumerate(np.nonzero(mutations_bitmap)[0]):
-            next_population[population_idx] = swap_mutation.swap(
-                next_population[population_idx], *swap_indices[idx]
-            )
+        mutations_count += _mutate(
+            next_population=next_population,
+            configuration=configuration,
+            mutation_indexes_choice=mutation_indexes_choice,
+        )
 
         population, next_population = next_population, population
 
