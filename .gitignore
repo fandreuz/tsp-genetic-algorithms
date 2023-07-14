@@ -9,6 +9,7 @@ __pycache__/
 **/*.o
 **/*.so
 **/*.mod
+**/*.pyf
 
 # Distribution / packaging
 .Python
