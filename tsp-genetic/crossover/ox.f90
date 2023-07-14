@@ -28,16 +28,15 @@ contains
       integer, dimension(size(parent1)) :: parent2, iparent1, child
       integer cut_start, cut_end, target, child_idx, parent_size
 
+      parent_size = size(parent2)
       child(cut_start:cut_end) = parent1(cut_start:cut_end)
 
-      child_idx = cut_end + 1
+      child_idx = wrap_to_top(cut_end + 1, parent_size)
       target = child_idx
 
-      parent_size = size(parent2)
       iparent1 = inverse_array(parent1)
 
       do while(child_idx .ne. cut_start)
-         child_idx = wrap_to_top(child_idx, parent_size)
          target = wrap_to_top(target, parent_size)
          if (in_bounds(cut_start, iparent1(parent2(target)), cut_end)) then
             target = target + 1
@@ -46,7 +45,7 @@ contains
 
          child(child_idx) = parent2(target)
          target = target + 1
-         child_idx = child_idx + 1
+         child_idx = wrap_to_top(child_idx + 1, parent_size)
       end do
    end function
 end module ox
