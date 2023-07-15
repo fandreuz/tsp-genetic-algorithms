@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(str(Path(__file__).parent.parent / "tsp-genetic-py/"))
 from evolve import driver
-from configuration import Configuration, CrossoverStrategy
+from configuration import Configuration, CrossoverStrategy, CrossoverRetainment
 from crossover import Crossover
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
@@ -50,6 +50,14 @@ parser.add_argument(
     help="Crossover strategy",
     default=CrossoverStrategy.ALL_IN_ORDER.value,
 )
+parser.add_argument(
+    "-r",
+    "--crossover-retainment",
+    type=int,
+    choices=[e.value for e in CrossoverStrategy],
+    help="Crossover strategy",
+    default=CrossoverStrategy.ALL_IN_ORDER.value,
+)
 
 args = parser.parse_args()
 
@@ -64,6 +72,7 @@ configuration = Configuration(
     print_every=args.print_every,
     crossover_strategy=CrossoverStrategy(args.crossover_strategy),
     crossover=Crossover(args.crossover),
+    crossover_retainment=CrossoverRetainment(args.crossover_retainment),
 )
 print(f"Configuration: {configuration}")
 

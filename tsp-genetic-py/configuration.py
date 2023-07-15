@@ -1,6 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from crossover import Crossover
+import numpy as np
 
 
 class CrossoverStrategy(Enum):
@@ -14,18 +15,81 @@ class CrossoverStrategy(Enum):
     FITNESS_RANDOM_PAIRS = 4
 
 
+class CrossoverRetainment(Enum):
+    # All children generated during a mating are retained
+    ALL_CHILDREN = 1
+    # Only first child is retained
+    FIRST = 2
+
+
+def assign_children_policy(crossover_retainment: CrossoverRetainment):
+    if crossover_retainment == CrossoverRetainment.ALL_CHILDREN:
+
+        def _assign_children(
+            c1: np.ndarray,
+            c2: np.ndarray,
+            start_idx: int,
+            parent_pair_idx: int,
+            next_population: np.ndarray,
+        ):
+            (
+                next_population[start_idx + parent_pair_idx * 2],
+                next_population[start_idx + parent_pair_idx * 2 + 1],
+            ) = (
+                c1,
+                c2,
+            )
+
+        def _assign_last_children(
+            c1: np.ndarray,
+            c2: np.ndarray,
+            start_idx: int,
+            next_population: np.ndarray,
+        ):
+            if (next_population.shape[0] - start_idx) % 2 == 0:
+                next_population[-2], next_population[-1] = c1, c2
+            else:
+                next_population[-1] = c1
+
+        return _assign_children, _assign_last_children
+
+    elif crossover_retainment == CrossoverRetainment.FIRST:
+
+        def _assign_children(
+            c1: np.ndarray,
+            c2: np.ndarray,
+            start_idx: int,
+            parent_pair_idx: int,
+            next_population: np.ndarray,
+        ):
+            next_population[start_idx + parent_pair_idx] = c1
+
+        def _assign_last_children(
+            c1: np.ndarray,
+            c2: np.ndarray,
+            start_idx: int,
+            next_population: np.ndarray,
+        ):
+            next_population[-1] = c1
+
+    else:
+        raise ValueError("Unexpected crossover retainment policy")
+
+    return _assign_children, _assign_last_children
+
+
 @dataclass
 class Configuration:
     # Population
     population_size: int
     elite_size: int
     n_generations: int
-    skip_last_child: bool = field(init=False)
 
     # Evolution
     mutation_probability: float
     crossover_strategy: CrossoverStrategy
     crossover: Crossover
+    crossover_retainment: CrossoverRetainment
 
     # Inspection
     print_every: int
@@ -43,9 +107,3 @@ class Configuration:
             raise ValueError(
                 f"Mutation probability: 0 <= {self.mutation_probability} <= 1"
             )
-
-        self.skip_last_child = self.mating_size % 2 == 1
-
-    @property
-    def mating_size(self) -> int:
-        return self.population_size - self.elite_size

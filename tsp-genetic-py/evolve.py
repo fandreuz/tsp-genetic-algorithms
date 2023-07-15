@@ -2,7 +2,12 @@ import numpy as np
 import sys
 from pathlib import Path
 
-from configuration import Configuration, CrossoverStrategy
+from configuration import (
+    Configuration,
+    CrossoverStrategy,
+    CrossoverRetainment,
+    assign_children_policy,
+)
 from crossover import crossover_functions, crossover_needs_2_rnd
 from inspection import print_header, print_inspection_message, print_mutations
 
@@ -37,28 +42,36 @@ def _elitism(
     next_population[: configuration.elite_size] = population[: configuration.elite_size]
 
 
+def _compute_parent_pairs(configuration: Configuration):
+    n_children_per_generation = configuration.population_size - configuration.elite_size
+    if configuration.crossover_retainment == CrossoverRetainment.ALL_CHILDREN:
+        pairs = n_children_per_generation // 2
+        if pairs * 2 < n_children_per_generation:
+            pairs += 1
+        return pairs
+    elif configuration.crossover_retainment == CrossoverRetainment.FIRST:
+        return n_children_per_generation
+    else:
+        raise ValueError("Unexpected crossover retainment policy")
+
+
 def _select_mating_pairs(
     configuration: Configuration,
     mating_indexes_choice: np.ndarray,
-    mating_size: int,
     fitness: np.ndarray,
 ):
+    parent_pairs = _compute_parent_pairs(configuration)
     if configuration.crossover_strategy == CrossoverStrategy.ALL_IN_ORDER:
-        parent_indexes = mating_indexes_choice
-        if mating_size > len(parent_indexes):
-            parent_indexes = np.concatenate(
-                (parent_indexes, (mating_indexes_choice[0],))
-            )
-        return parent_indexes
+        return np.tile(mating_indexes_choice, 2)[: parent_pairs * 2]
     elif configuration.crossover_strategy == CrossoverStrategy.ALL_RANDOM_PAIRS:
-        return rnd.permutation(
-            np.concatenate((mating_indexes_choice, (mating_indexes_choice[0],)))
-        )
+        return rnd.permutation(np.tile(mating_indexes_choice, 2)[: parent_pairs * 2])
     elif configuration.crossover_strategy == CrossoverStrategy.RANDOM_PAIRS:
-        return rnd.choice(mating_indexes_choice, mating_size)
+        return rnd.choice(mating_indexes_choice, parent_pairs * 2)
     elif configuration.crossover_strategy == CrossoverStrategy.FITNESS_RANDOM_PAIRS:
         ifitness = 1 / fitness
-        return rnd.choice(mating_indexes_choice, mating_size, p=ifitness / ifitness.sum())
+        return rnd.choice(
+            mating_indexes_choice, parent_pairs * 2, p=ifitness / ifitness.sum()
+        )
     else:
         raise ValueError(
             f"Unexpected crossover strategy: {configuration.crossover_strategy}"
@@ -71,32 +84,41 @@ def _mate(
     configuration: Configuration,
 ):
     M = len(mating_population)
-    M2 = M // 2
+    assert M % 2 == 0
+    Md2 = M // 2
 
     if configuration.crossover in crossover_needs_2_rnd:
         additional_args = rnd.random(M).reshape(-1, 2)
     else:
-        additional_args = [tuple() for _ in range(M2)]
+        additional_args = [tuple() for _ in range(Md2)]
 
     crossover_function = crossover_functions[configuration.crossover]
-    for i in range(M2 - 1):
-        i2 = i * 2
+    assign_children, assign_last_children = assign_children_policy(
+        configuration.crossover_retainment
+    )
 
+    for i in range(Md2 - 1):
+        i2 = i * 2
         p1 = mating_population[i2]
         p2 = mating_population[i2 + 1]
-        (
-            next_population[configuration.elite_size + i2],
-            next_population[configuration.elite_size + i2 + 1],
-        ) = crossover_function(p1, p2, *(additional_args[i]))
+        c1, c2 = crossover_function(p1, p2, *(additional_args[i]))
+        assign_children(
+            c1=c1,
+            c2=c2,
+            start_idx=configuration.elite_size,
+            parent_pair_idx=i,
+            next_population=next_population,
+        )
 
     p1 = mating_population[-2]
     p2 = mating_population[-1]
-    if configuration.skip_last_child:
-        next_population[-1], _ = crossover_function(p1, p2, *(additional_args[-1]))
-    else:
-        next_population[-2], next_population[-1] = crossover_function(
-            p1, p2, *(additional_args[-1])
-        )
+    c1, c2 = crossover_function(p1, p2, *(additional_args[-1]))
+    assign_last_children(
+        c1=c1,
+        c2=c2,
+        start_idx=configuration.elite_size,
+        next_population=next_population,
+    )
 
 
 def _mutate(
@@ -132,7 +154,6 @@ def driver(problem: Problem, configuration: Configuration):
         print_header()
 
     mutations_count = 0
-    mating_size = configuration.mating_size + configuration.skip_last_child
 
     for current_generation in range(configuration.n_generations - 1):
         fitness = _compute_fitness(problem.cost_matrix, population)
@@ -154,7 +175,6 @@ def driver(problem: Problem, configuration: Configuration):
         mating_pairs = _select_mating_pairs(
             configuration=configuration,
             mating_indexes_choice=mating_indexes_choice,
-            mating_size=mating_size,
             fitness=fitness[configuration.elite_size :],
         )
         _mate(
