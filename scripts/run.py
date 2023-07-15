@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 import sys
+from utils import enum_content
 
 sys.path.append(str(Path(__file__).parent.parent / "tsp-genetic-py/"))
 from evolve import driver
@@ -35,7 +36,7 @@ parser.add_argument(
     "--next-generation",
     type=int,
     choices=[e.value for e in NextGenerationPolicy],
-    help="Next generation policy",
+    help="Next generation policy-- " + enum_content(NextGenerationPolicy),
     default=NextGenerationPolicy.REPLACE_ALL.value,
 )
 parser.add_argument(
@@ -52,7 +53,7 @@ parser.add_argument(
     "--crossover",
     type=int,
     choices=[e.value for e in Crossover],
-    help="Crossover",
+    help="Crossover -- " + enum_content(CrossoverStrategy),
     default=Crossover.CX2.value,
 )
 parser.add_argument(
@@ -60,16 +61,16 @@ parser.add_argument(
     "--crossover-strategy",
     type=int,
     choices=[e.value for e in CrossoverStrategy],
-    help="Crossover strategy",
+    help="Crossover strategy -- " + enum_content(Crossover),
     default=CrossoverStrategy.ALL_IN_ORDER.value,
 )
 parser.add_argument(
     "-r",
     "--crossover-retainment",
     type=int,
-    choices=[e.value for e in CrossoverStrategy],
-    help="Crossover strategy",
-    default=CrossoverStrategy.ALL_IN_ORDER.value,
+    choices=[e.value for e in CrossoverRetainment],
+    help="Crossover retainment -- " + enum_content(CrossoverRetainment),
+    default=CrossoverRetainment.ALL_CHILDREN,
 )
 
 args = parser.parse_args()
