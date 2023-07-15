@@ -31,22 +31,33 @@ def _elitism(
     fitness: np.ndarray,
     configuration: Configuration,
 ):
-    population = population[np.argsort(fitness)]
+    idxs = np.argsort(fitness)
+    population = population[idxs]
+    fitness = fitness[idxs]
     next_population[: configuration.elite_size] = population[: configuration.elite_size]
 
 
 def _select_mating_pairs(
-    configuration: Configuration, mating_indexes_choice: np.ndarray, mating_size: int
+    configuration: Configuration,
+    mating_indexes_choice: np.ndarray,
+    mating_size: int,
+    fitness: np.ndarray,
 ):
     if configuration.crossover_strategy == CrossoverStrategy.ALL_IN_ORDER:
         parent_indexes = mating_indexes_choice
         if mating_size > len(parent_indexes):
-            parent_indexes = np.concatenate((parent_indexes, (0,)))
+            parent_indexes = np.concatenate(
+                (parent_indexes, (mating_indexes_choice[0],))
+            )
         return parent_indexes
     elif configuration.crossover_strategy == CrossoverStrategy.ALL_RANDOM_PAIRS:
-        return rnd.permutation(np.concatenate((mating_indexes_choice, (0,))))
+        return rnd.permutation(
+            np.concatenate((mating_indexes_choice, (mating_indexes_choice[0],)))
+        )
     elif configuration.crossover_strategy == CrossoverStrategy.RANDOM_PAIRS:
         return rnd.choice(mating_indexes_choice, mating_size)
+    elif configuration.crossover_strategy == CrossoverStrategy.FITNESS_RANDOM_PAIRS:
+        return rnd.choice(mating_indexes_choice, mating_size, p=fitness / fitness.sum())
     else:
         raise ValueError(
             f"Unexpected crossover strategy: {configuration.crossover_strategy}"
@@ -107,10 +118,10 @@ def _mutate(
 
 
 def driver(problem: Problem, configuration: Configuration):
-    mating_indexes_choice = list(
-        range(configuration.elite_size, configuration.population_size)
+    mating_indexes_choice = np.arange(
+        configuration.elite_size, configuration.population_size
     )
-    mutation_indexes_choice = list(range(1, problem.n_nodes + 1))
+    mutation_indexes_choice = np.arange(1, problem.n_nodes + 1)
 
     population = _init_population(problem.n_nodes, configuration.population_size)
     next_population = np.empty_like(population, order="F")
@@ -143,6 +154,7 @@ def driver(problem: Problem, configuration: Configuration):
             configuration=configuration,
             mating_indexes_choice=mating_indexes_choice,
             mating_size=mating_size,
+            fitness=fitness[configuration.elite_size :],
         )
         _mate(
             configuration=configuration,

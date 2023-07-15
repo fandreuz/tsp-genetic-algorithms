@@ -10,6 +10,8 @@ class CrossoverStrategy(Enum):
     ALL_RANDOM_PAIRS = 2
     # Random pairs of parents
     RANDOM_PAIRS = 3
+    # Random pairs of parents with probability depending on fitness
+    FITNESS_RANDOM_PAIRS = 4
 
 
 @dataclass
