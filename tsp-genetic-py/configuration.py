@@ -78,6 +78,13 @@ def assign_children_policy(crossover_retainment: CrossoverRetainment):
     return _assign_children, _assign_last_children
 
 
+class NextGenerationPolicy(Enum):
+    # Next generation will replace entirely the old one
+    REPLACE_ALL = 1
+    # The best chromosomes are retained according to fitness
+    BEST = 2
+
+
 @dataclass
 class Configuration:
     # Population
@@ -90,6 +97,7 @@ class Configuration:
     crossover_strategy: CrossoverStrategy
     crossover: Crossover
     crossover_retainment: CrossoverRetainment
+    next_generation_policy: NextGenerationPolicy
 
     # Inspection
     print_every: int
@@ -106,4 +114,11 @@ class Configuration:
         if not 0 <= self.mutation_probability <= 1:
             raise ValueError(
                 f"Mutation probability: 0 <= {self.mutation_probability} <= 1"
+            )
+        if (
+            self.next_generation_policy == NextGenerationPolicy.BEST
+            and self.elite_size > 0
+        ):
+            raise ValueError(
+                "elite_size > 0 is incompatible with NextGenerationPolicy.BEST"
             )

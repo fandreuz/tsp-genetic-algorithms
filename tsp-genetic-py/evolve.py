@@ -7,6 +7,7 @@ from configuration import (
     CrossoverStrategy,
     CrossoverRetainment,
     assign_children_policy,
+    NextGenerationPolicy,
 )
 from crossover import crossover_functions, crossover_needs_2_rnd
 from inspection import print_header, print_inspection_message, print_mutations
@@ -189,8 +190,20 @@ def driver(problem: Problem, configuration: Configuration):
         )
         next_fitness = _compute_fitness(problem.cost_matrix, next_population)
 
-        population, next_population = next_population, population
-        fitness = next_fitness
+        if configuration.next_generation_policy == NextGenerationPolicy.REPLACE_ALL:
+            population, next_population = next_population, population
+            fitness = next_fitness
+        elif configuration.next_generation_policy == NextGenerationPolicy.BEST:
+            tot_fitness = np.concatenate((fitness, next_fitness))
+            idxes = np.argsort(tot_fitness)
+            keep = idxes[: configuration.population_size]
+
+            fitness = tot_fitness[keep]
+            population = np.vstack((population, next_population))[keep]
+        else:
+            raise ValueError(
+                f"Unexpected policy: {configuration.next_generation_policy}"
+            )
 
     current_generation = configuration.n_generations - 1
     if current_generation % configuration.print_every == 0:

@@ -4,7 +4,12 @@ import sys
 
 sys.path.append(str(Path(__file__).parent.parent / "tsp-genetic-py/"))
 from evolve import driver
-from configuration import Configuration, CrossoverStrategy, CrossoverRetainment
+from configuration import (
+    Configuration,
+    CrossoverStrategy,
+    CrossoverRetainment,
+    NextGenerationPolicy,
+)
 from crossover import Crossover
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
@@ -24,6 +29,14 @@ parser.add_argument(
     type=float,
     help="Size of the inter-generational elite",
     default=0.1,
+)
+parser.add_argument(
+    "-n",
+    "--next-generation",
+    type=int,
+    choices=[e.value for e in NextGenerationPolicy],
+    help="Next generation policy",
+    default=NextGenerationPolicy.REPLACE_ALL.value,
 )
 parser.add_argument(
     "--print-every",
@@ -73,6 +86,7 @@ configuration = Configuration(
     crossover_strategy=CrossoverStrategy(args.crossover_strategy),
     crossover=Crossover(args.crossover),
     crossover_retainment=CrossoverRetainment(args.crossover_retainment),
+    next_generation_policy=NextGenerationPolicy(args.next_generation),
 )
 print(f"Configuration: {configuration}")
 
