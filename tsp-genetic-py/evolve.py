@@ -133,10 +133,10 @@ def driver(problem: Problem, configuration: Configuration):
             )
 
         _elitism(
+            configuration=configuration,
             population=population,
             next_population=next_population,
             fitness=fitness,
-            configuration=configuration,
         )
 
         mating_pairs = _select_mating_pairs(
@@ -145,19 +145,18 @@ def driver(problem: Problem, configuration: Configuration):
             mating_size=mating_size,
         )
         _mate(
+            configuration=configuration,
             mating_population=population[mating_pairs],
             next_population=next_population,
-            configuration=configuration,
         )
 
         mutations_count += _mutate(
-            next_population=next_population,
             configuration=configuration,
+            next_population=next_population,
             mutation_indexes_choice=mutation_indexes_choice,
         )
 
         population, next_population = next_population, population
-        print(next_population)
 
     fitness = _compute_fitness(problem.cost_matrix, population)
     current_generation = configuration.n_generations - 1
