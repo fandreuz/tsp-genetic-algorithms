@@ -32,8 +32,8 @@ def _elitism(
     configuration: Configuration,
 ):
     idxs = np.argsort(fitness)
-    population = population[idxs]
-    fitness = fitness[idxs]
+    population[:] = population[idxs]
+    fitness[:] = fitness[idxs]
     next_population[: configuration.elite_size] = population[: configuration.elite_size]
 
 
@@ -57,7 +57,8 @@ def _select_mating_pairs(
     elif configuration.crossover_strategy == CrossoverStrategy.RANDOM_PAIRS:
         return rnd.choice(mating_indexes_choice, mating_size)
     elif configuration.crossover_strategy == CrossoverStrategy.FITNESS_RANDOM_PAIRS:
-        return rnd.choice(mating_indexes_choice, mating_size, p=fitness / fitness.sum())
+        ifitness = 1 / fitness
+        return rnd.choice(mating_indexes_choice, mating_size, p=ifitness / ifitness.sum())
     else:
         raise ValueError(
             f"Unexpected crossover strategy: {configuration.crossover_strategy}"
