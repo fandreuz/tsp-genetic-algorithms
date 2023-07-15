@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 import sys
+import pickle
 from utils import enum_content
 
 sys.path.append(str(Path(__file__).parent.parent / "tsp-genetic-py/"))
@@ -14,6 +15,7 @@ from configuration import (
 from crossover import Crossover
 from mutation import Mutation
 from printer import Printer
+from data_storage import DataStorage
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
 from load import build_problem
@@ -22,6 +24,9 @@ from math import floor
 
 parser = argparse.ArgumentParser(prog="tsp-genetic")
 parser.add_argument("-d", "--data", type=str, help="TSP data", required=True)
+parser.add_argument(
+    "--file", type=str, help="File name where to store data", required=False
+)
 parser.add_argument("-p", "--population", type=int, help="Population size", default=20)
 parser.add_argument(
     "-g", "--generations", type=int, help="N. of generations", default=500
@@ -107,5 +112,11 @@ configuration = Configuration(
 )
 print(f"Configuration: {configuration}")
 
-output = driver(problem, configuration, Printer())
+logger = DataStorage() if args.file is not None else Printer()
+output = driver(problem, configuration, logger)
+
+if args.file is not None:
+    with open(args.file, "wb") as f:
+        pickle.dump(logger, f)
+
 print(output[1:])
