@@ -13,6 +13,7 @@ from configuration import (
 )
 from crossover import Crossover
 from mutation import Mutation
+from printer import Printer
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
 from load import build_problem
@@ -106,4 +107,5 @@ configuration = Configuration(
 )
 print(f"Configuration: {configuration}")
 
-print(driver(problem, configuration)[1:])
+output = driver(problem, configuration, Printer())
+print(output[1:])

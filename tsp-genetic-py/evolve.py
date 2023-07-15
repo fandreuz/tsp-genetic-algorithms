@@ -11,7 +11,7 @@ from configuration import (
 )
 from crossover import crossover_functions, crossover_needs_2_rnd
 from mutation import mutation_needs_2_rnd, mutation_functions
-from inspection import print_header, print_inspection_message, print_mutations
+from idata_logger import IDataLogger
 
 sys.path.append(str(Path(__file__).parent.parent))
 from tsp_genetic import utils, problem as genetic_problem
@@ -149,7 +149,7 @@ def _mutate(
     return n_mutations
 
 
-def driver(problem: Problem, configuration: Configuration):
+def driver(problem: Problem, configuration: Configuration, data_logger: IDataLogger):
     mating_indexes_choice = np.arange(
         configuration.elite_size, configuration.population_size
     )
@@ -160,14 +160,14 @@ def driver(problem: Problem, configuration: Configuration):
 
     optimum = _compute_fitness(problem.cost_matrix, problem.optimal_tour[None])[0]
     if configuration.print_every > 0:
-        print_header()
+        data_logger.log_header()
 
     mutations_count = 0
 
     fitness = _compute_fitness(problem.cost_matrix, population)
     for current_generation in range(1, configuration.n_generations):
         if current_generation % configuration.print_every == 0:
-            print_inspection_message(
+            data_logger.log_inspection_message(
                 current_generation=current_generation,
                 fitness=fitness,
                 optimum=optimum,
@@ -216,13 +216,13 @@ def driver(problem: Problem, configuration: Configuration):
 
     current_generation = configuration.n_generations
     if current_generation % configuration.print_every == 0:
-        print_inspection_message(
+        data_logger.log_inspection_message(
             current_generation=current_generation,
             fitness=fitness,
             optimum=optimum,
         )
 
-    print_mutations(mutations_count)
+    data_logger.log_mutations(mutations_count)
 
     best = np.argmin(fitness)
     return population[best], fitness[best], optimum
