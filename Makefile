@@ -9,6 +9,7 @@ SRC=tsp-genetic-f90/utils.f90 \
 	tsp-genetic-f90/crossover/cx2-original.f90 \
 	tsp-genetic-f90/mutation/twors.f90 \
 	tsp-genetic-f90/mutation/central_inverse.f90 \
+	tsp-genetic-f90/mutation/reverse_sequence.f90 \
 	tsp-genetic-f90/problem.f90
 
 compile:
