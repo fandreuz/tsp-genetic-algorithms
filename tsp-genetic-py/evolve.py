@@ -183,7 +183,7 @@ def driver(problem: Problem, configuration: Configuration):
     print_mutations(mutations_count)
 
     best = np.argmin(fitness)
-    best_n = np.count_nonzero(fitness == fitness[best])
-    print(f"Optimum: {best_n}/{configuration.population_size}")
+    optimum_n = np.count_nonzero(fitness == optimum)
+    print(f"Optimum: {optimum_n}/{configuration.population_size}")
 
     return population[best], fitness[best], optimum
