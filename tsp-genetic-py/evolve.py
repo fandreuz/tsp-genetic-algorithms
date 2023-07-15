@@ -126,10 +126,10 @@ def _mutate(
     next_population: np.ndarray,
     configuration: Configuration,
     mutation_indexes_choice: np.ndarray,
+    generation_count: int,
 ):
-    mutations_bitmap = rnd.binomial(
-        1, configuration.mutation_probability, configuration.population_size
-    ).astype(bool)
+    mp = configuration.compute_mutation_probability(generation_count)
+    mutations_bitmap = rnd.binomial(1, mp, configuration.population_size).astype(bool)
     n_mutations = np.sum(mutations_bitmap)
 
     swap_indices = rnd.choice(mutation_indexes_choice, size=(n_mutations, 2))
@@ -184,6 +184,7 @@ def driver(problem: Problem, configuration: Configuration):
         )
 
         mutations_count += _mutate(
+            generation_count=current_generation,
             configuration=configuration,
             next_population=next_population,
             mutation_indexes_choice=mutation_indexes_choice,

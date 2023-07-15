@@ -94,6 +94,7 @@ class Configuration:
 
     # Evolution
     mutation_probability: float
+    mutation_function_degree: int
     crossover_strategy: CrossoverStrategy
     crossover: Crossover
     crossover_retainment: CrossoverRetainment
@@ -115,6 +116,10 @@ class Configuration:
             raise ValueError(
                 f"Mutation probability: 0 <= {self.mutation_probability} <= 1"
             )
+        if self.mutation_function_degree < 0:
+            raise ValueError(
+                f"Mutation function degree: {self.mutation_function_degree} >= 0"
+            )
         if (
             self.next_generation_policy == NextGenerationPolicy.BEST
             and self.elite_size > 0
@@ -122,3 +127,22 @@ class Configuration:
             raise ValueError(
                 "elite_size > 0 is incompatible with NextGenerationPolicy.BEST"
             )
+
+        if self.mutation_function_degree > 0:
+            mutation_function_parameter = (
+                self.mutation_probability
+                / (self.n_generations - 1) ** self.mutation_function_degree
+            )
+
+            def compute_mutation_probability(generation_count):
+                return (
+                    generation_count**self.mutation_function_degree
+                    * mutation_function_parameter
+                )
+
+        else:
+
+            def compute_mutation_probability(generation_count):
+                return self.mutation_probability
+
+        self.compute_mutation_probability = compute_mutation_probability

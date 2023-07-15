@@ -46,7 +46,13 @@ parser.add_argument(
     default=100,
 )
 parser.add_argument(
-    "-m", "--mutation", type=float, help="Mutation probability", default=0.1
+    "-m", "--mutation-probability", type=float, help="Mutation probability", default=0.1
+)
+parser.add_argument(
+    "--mutation-function-degree",
+    type=int,
+    help="Degree of the function describing the evolution of the mutation probability",
+    default=0,
 )
 parser.add_argument(
     "-c",
@@ -82,7 +88,8 @@ configuration = Configuration(
     population_size=args.population,
     elite_size=floor(args.elite * args.population),
     n_generations=args.generations,
-    mutation_probability=args.mutation,
+    mutation_probability=args.mutation_probability,
+    mutation_function_degree=args.mutation_function_degree,
     print_every=args.print_every,
     crossover_strategy=CrossoverStrategy(args.crossover_strategy),
     crossover=Crossover(args.crossover),
