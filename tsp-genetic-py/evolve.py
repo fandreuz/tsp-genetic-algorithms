@@ -155,9 +155,8 @@ def driver(problem: Problem, configuration: Configuration):
 
     mutations_count = 0
 
+    fitness = _compute_fitness(problem.cost_matrix, population)
     for current_generation in range(configuration.n_generations - 1):
-        fitness = _compute_fitness(problem.cost_matrix, population)
-
         if current_generation % configuration.print_every == 0:
             print_inspection_message(
                 current_generation=current_generation,
@@ -188,10 +187,11 @@ def driver(problem: Problem, configuration: Configuration):
             next_population=next_population,
             mutation_indexes_choice=mutation_indexes_choice,
         )
+        next_fitness = _compute_fitness(problem.cost_matrix, next_population)
 
         population, next_population = next_population, population
+        fitness = next_fitness
 
-    fitness = _compute_fitness(problem.cost_matrix, population)
     current_generation = configuration.n_generations - 1
     if current_generation % configuration.print_every == 0:
         print_inspection_message(
