@@ -41,7 +41,8 @@ def _select_mating_pairs(
     if configuration.crossover_strategy == CrossoverStrategy.ALL_IN_ORDER:
         parent_indexes = mating_indexes_choice
         if mating_size > len(parent_indexes):
-            return np.concatenate((parent_indexes, (0,)))
+            parent_indexes = np.concatenate((parent_indexes, (0,)))
+        return parent_indexes
     elif configuration.crossover_strategy == CrossoverStrategy.ALL_RANDOM_PAIRS:
         return rnd.permutation(np.concatenate((mating_indexes_choice, (0,))))
     elif configuration.crossover_strategy == CrossoverStrategy.RANDOM_PAIRS:
