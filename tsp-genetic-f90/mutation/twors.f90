@@ -1,7 +1,7 @@
-module swap_mutation
-   public :: swap
+module twors
+   public :: mutate
 contains
-   function swap(chromosome, pos1, pos2) result(mutated)
+   function mutate(chromosome, pos1, pos2) result(mutated)
       integer, dimension(:) :: chromosome
       integer :: pos1, pos2
       integer, dimension(size(chromosome)) :: mutated
@@ -10,4 +10,4 @@ contains
       mutated(pos1) = chromosome(pos2)
       mutated(pos2) = chromosome(pos1)
    end function
-end module swap_mutation
+end module twors
