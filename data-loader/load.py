@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from pathlib import Path
 import numpy as np
-from itertools import dropwhile
+from itertools import dropwhile, takewhile
 
 from problem import Problem, toy_problem
 
@@ -27,14 +27,25 @@ def _extract_problem_structure(name: str):
     return root.findtext("name"), cost_matrix
 
 
+def _isdigit(s):
+    return s.strip().isdigit()
+
+
+def _negate(predicate):
+    return lambda x: not predicate(x)
+
+
 def _extract_optimal_tour(name: str) -> np.ndarray:
     file = data_directory / (name + ".opt.tour")
     with open(file, "r") as file_content:
         tour = [
-            int(l) for l in dropwhile(lambda l: not l.strip().isdigit(), file_content)
+            int(l)
+            for l in takewhile(
+                _isdigit,
+                dropwhile(_negate(_isdigit), file_content),
+            )
         ]
-        # Skip the -1 at the end
-        return tour[:-1]
+        return tour
 
 
 def build_problem(name: str) -> Problem:

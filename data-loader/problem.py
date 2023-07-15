@@ -9,6 +9,9 @@ class Problem:
     optimal_tour: np.ndarray
 
     def __post_init__(self):
+        assert self.cost_matrix.shape[1] == self.cost_matrix.shape[0] - 1
+        assert len(set(self.optimal_tour)) == self.cost_matrix.shape[0]
+
         self.cost_matrix = np.asfortranarray(self.cost_matrix)
         self.optimal_tour = np.asfortranarray(self.optimal_tour)
 
