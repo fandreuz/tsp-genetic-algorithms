@@ -1,9 +1,4 @@
 import numpy as np
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
-from problem import Problem
 
 _generation_pad = 12
 _stats_pad = 10
