@@ -165,7 +165,7 @@ def driver(problem: Problem, configuration: Configuration):
     mutations_count = 0
 
     fitness = _compute_fitness(problem.cost_matrix, population)
-    for current_generation in range(configuration.n_generations - 1):
+    for current_generation in range(1, configuration.n_generations):
         if current_generation % configuration.print_every == 0:
             print_inspection_message(
                 current_generation=current_generation,
@@ -214,7 +214,7 @@ def driver(problem: Problem, configuration: Configuration):
                 f"Unexpected policy: {configuration.next_generation_policy}"
             )
 
-    current_generation = configuration.n_generations - 1
+    current_generation = configuration.n_generations
     if current_generation % configuration.print_every == 0:
         print_inspection_message(
             current_generation=current_generation,

@@ -148,3 +148,7 @@ class Configuration:
                 return self.mutation_probability
 
         self.compute_mutation_probability = compute_mutation_probability
+
+        if self.print_every <= 0:
+            # Never
+            self.print_every = self.n_generations + 1
