@@ -157,6 +157,7 @@ def driver(problem: Problem, configuration: Configuration):
         )
 
         population, next_population = next_population, population
+        print(next_population)
 
     fitness = _compute_fitness(problem.cost_matrix, population)
     current_generation = configuration.n_generations - 1
