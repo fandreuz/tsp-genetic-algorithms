@@ -2,6 +2,7 @@ import argparse
 from pathlib import Path
 import sys
 
+sys.path.append(str(Path(__file__).parent.parent / "tsp-genetic-py/"))
 from evolve import driver
 from configuration import Configuration, CrossoverStrategy
 from crossover import Crossover
