@@ -89,12 +89,12 @@ def _mate(
     assert M % 2 == 0
     Md2 = M // 2
 
-    if configuration.crossover in crossover_needs_2_rnd:
+    if configuration.crossover_operator in crossover_needs_2_rnd:
         additional_args = rnd.random(M).reshape(-1, 2)
     else:
         additional_args = [tuple() for _ in range(Md2)]
 
-    crossover_function = crossover_functions[configuration.crossover]
+    crossover_function = crossover_functions[configuration.crossover_operator]
     assign_children, assign_last_children = assign_children_policy(
         configuration.crossover_retainment
     )

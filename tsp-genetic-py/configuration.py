@@ -93,12 +93,12 @@ class Configuration:
     elite_size: int
     n_generations: int
 
-    # Evolution
     mutation_operator: Mutation
     mutation_probability: float
     mutation_function_degree: int
+
+    crossover_operator: Crossover
     crossover_strategy: CrossoverStrategy
-    crossover: Crossover
     crossover_retainment: CrossoverRetainment
     next_generation_policy: NextGenerationPolicy
 

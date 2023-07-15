@@ -95,14 +95,14 @@ configuration = Configuration(
     population_size=args.population,
     elite_size=floor(args.elite * args.population),
     n_generations=args.generations,
+    crossover_operator=Crossover(args.crossover),
+    crossover_strategy=CrossoverStrategy(args.crossover_strategy),
+    crossover_retainment=CrossoverRetainment(args.crossover_retainment),
+    next_generation_policy=NextGenerationPolicy(args.next_generation),
     mutation_operator=Mutation(args.mutation_operator),
     mutation_probability=args.mutation_probability,
     mutation_function_degree=args.mutation_function_degree,
     print_every=args.print_every,
-    crossover_strategy=CrossoverStrategy(args.crossover_strategy),
-    crossover=Crossover(args.crossover),
-    crossover_retainment=CrossoverRetainment(args.crossover_retainment),
-    next_generation_policy=NextGenerationPolicy(args.next_generation),
 )
 print(f"Configuration: {configuration}")
 
