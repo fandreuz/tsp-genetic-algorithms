@@ -10,10 +10,11 @@ from configuration import (
     NextGenerationPolicy,
 )
 from crossover import crossover_functions, crossover_needs_2_rnd
+from mutation import mutation_needs_2_rnd, mutation_functions
 from inspection import print_header, print_inspection_message, print_mutations
 
 sys.path.append(str(Path(__file__).parent.parent))
-from tsp_genetic import utils, problem as genetic_problem, swap_mutation
+from tsp_genetic import utils, problem as genetic_problem
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
 from problem import Problem
@@ -132,9 +133,16 @@ def _mutate(
     mutations_bitmap = rnd.binomial(1, mp, configuration.population_size).astype(bool)
     n_mutations = np.sum(mutations_bitmap)
 
-    swap_indices = rnd.choice(mutation_indexes_choice, size=(n_mutations, 2))
+    rnd_per_mutation = (
+        2 if configuration.mutation_operator in mutation_needs_2_rnd else 1
+    )
+    swap_indices = rnd.choice(
+        mutation_indexes_choice, size=(n_mutations, rnd_per_mutation)
+    )
+
+    mutation_function = mutation_functions[configuration.mutation_operator]
     for idx, population_idx in enumerate(np.nonzero(mutations_bitmap)[0]):
-        next_population[population_idx] = swap_mutation.swap(
+        next_population[population_idx] = mutation_function(
             next_population[population_idx], *swap_indices[idx]
         )
 

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from crossover import Crossover
+from mutation import Mutation
 import numpy as np
 
 
@@ -93,6 +94,7 @@ class Configuration:
     n_generations: int
 
     # Evolution
+    mutation_operator: Mutation
     mutation_probability: float
     mutation_function_degree: int
     crossover_strategy: CrossoverStrategy

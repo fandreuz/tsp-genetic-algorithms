@@ -12,6 +12,7 @@ from configuration import (
     NextGenerationPolicy,
 )
 from crossover import Crossover
+from mutation import Mutation
 
 sys.path.append(str(Path(__file__).parent.parent / "data-loader/"))
 from load import build_problem
@@ -44,6 +45,12 @@ parser.add_argument(
     type=int,
     help="Generations distance between two population inspection messages",
     default=100,
+)
+parser.add_argument(
+    "--mutation-operator",
+    type=int,
+    help="Mutation operator -- " + enum_content(Mutation),
+    default=Mutation.TWORS.value,
 )
 parser.add_argument(
     "-m", "--mutation-probability", type=float, help="Mutation probability", default=0.1
@@ -88,6 +95,7 @@ configuration = Configuration(
     population_size=args.population,
     elite_size=floor(args.elite * args.population),
     n_generations=args.generations,
+    mutation_operator=Mutation(args.mutation_operator),
     mutation_probability=args.mutation_probability,
     mutation_function_degree=args.mutation_function_degree,
     print_every=args.print_every,
