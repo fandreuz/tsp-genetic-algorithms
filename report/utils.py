@@ -35,7 +35,7 @@ def plot_std(generations, data, color):
     )
 
 
-def plot_data(generations, labels, best_data, mean_data=None):
+def plot_data(generations, labels, best_data, mean_data=None, should_plot_std=True):
     setup_matplotlib()
 
     if mean_data is not None:
@@ -45,8 +45,9 @@ def plot_data(generations, labels, best_data, mean_data=None):
         get_color(plt.plot(generations, data.fitness_mean, label=label))
         for data, label in zip(best_data, labels)
     ]
-    for data, label, color in zip(best_data, labels, colors):
-        plot_std(generations=generations, data=data, color=color)
+    if should_plot_std:
+        for data, label, color in zip(best_data, labels, colors):
+            plot_std(generations=generations, data=data, color=color)
 
     plt.title("Best")
     plt.legend()
@@ -57,7 +58,8 @@ def plot_data(generations, labels, best_data, mean_data=None):
         plt.subplot(1, 2, 2)
         for data, label, color in zip(mean_data, labels, colors):
             plt.plot(generations, data.fitness_mean, color, label=label)
-            plot_std(generations=generations, data=data, color=color)
+            if should_plot_std:
+                plot_std(generations=generations, data=data, color=color)
 
         plt.title("Mean")
         plt.legend()
