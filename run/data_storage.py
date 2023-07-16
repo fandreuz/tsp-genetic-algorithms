@@ -17,7 +17,7 @@ class DataStorage(IDataLogger):
         self._fitness_best = np.array([])
         self._fitness_worst = np.array([])
         self._fitness_mean = np.array([])
-        self._fitness_variance = np.array([])
+        self._fitness_std = np.array([])
 
     @property
     def mutations(self):
@@ -36,8 +36,8 @@ class DataStorage(IDataLogger):
         return self._fitness_mean
 
     @property
-    def fitness_variance(self):
-        return self._fitness_variance
+    def fitness_std(self):
+        return self._fitness_std
 
     @override
     def log_header(self):
@@ -50,8 +50,8 @@ class DataStorage(IDataLogger):
         self._fitness_best = np.concatenate((self._fitness_best, (np.min(fitness),)))
         self._fitness_worst = np.concatenate((self._fitness_worst, (np.max(fitness),)))
         self._fitness_mean = np.concatenate((self._fitness_mean, (np.mean(fitness),)))
-        self._fitness_variance = np.concatenate(
-            (self._fitness_variance, (np.var(fitness),))
+        self._fitness_std = np.concatenate(
+            (self._fitness_std, (np.std(fitness, ddof=1),))
         )
 
     @override
