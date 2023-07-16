@@ -4,19 +4,19 @@ module ox
    public :: order_crossover
    private :: order_crossover_child
 contains
-   subroutine order_crossover(parent1, parent2, rnd1, rnd2, child1, child2)
+   subroutine order_crossover(parent1, parent2, pos1, pos2, child1, child2)
       integer, dimension(:), intent(in) :: parent1
       integer, dimension(size(parent1)), intent(in) :: parent2
-      real :: rnd1, rnd2
+      integer, intent(in) :: pos1, pos2
       integer, dimension(size(parent1)), intent(out) :: child1, child2
-      integer cut_start, cut_end, tmp
+      integer :: cut_start, cut_end
 
-      cut_start = floor(rnd1 * size(parent1)) + 1
-      cut_end = floor(rnd2 * size(parent1)) + 1
-      if (cut_end < cut_start) then
-         tmp = cut_start
-         cut_start = cut_end
-         cut_end = tmp
+      if (pos1 <= pos2) then
+         cut_start = pos1
+         cut_end = pos2
+      else
+         cut_start = pos2
+         cut_end = pos1
       end if
 
       child1(:) = order_crossover_child(parent1, parent2, cut_start, cut_end)

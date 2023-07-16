@@ -90,7 +90,10 @@ def _mate(
     Md2 = M // 2
 
     if configuration.crossover_operator in crossover_needs_2_rnd:
-        additional_args = rnd.random(M).reshape(-1, 2)
+        n_vertices = next_population.shape[1]
+        additional_args = rnd.integers(
+            low=1, high=n_vertices, size=M, endpoint=True
+        ).reshape(-1, 2)
     else:
         additional_args = [tuple() for _ in range(Md2)]
 
