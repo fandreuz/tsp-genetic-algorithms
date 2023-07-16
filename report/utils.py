@@ -35,7 +35,9 @@ def plot_std(generations, data, color):
     )
 
 
-def plot_data(generations, labels, best_data, mean_data=None, should_plot_std=True):
+def plot_data(
+    generations, labels, best_data, mean_data=None, should_plot_std=True, n_runs=None
+):
     setup_matplotlib()
 
     if mean_data is not None:
@@ -49,7 +51,10 @@ def plot_data(generations, labels, best_data, mean_data=None, should_plot_std=Tr
         for data, label, color in zip(best_data, labels, colors):
             plot_std(generations=generations, data=data, color=color)
 
-    plt.title("Best")
+    if n_runs is None:
+        plt.title("Best")
+    else:
+        plt.title(f"Best (mean of {n_runs} runs)")
     plt.legend()
     plt.xlabel("Generation")
     plt.grid()
@@ -61,7 +66,10 @@ def plot_data(generations, labels, best_data, mean_data=None, should_plot_std=Tr
             if should_plot_std:
                 plot_std(generations=generations, data=data, color=color)
 
-        plt.title("Mean")
+        if n_runs is None:
+            plt.title("Mean")
+        else:
+            plt.title(f"Mean of {n_runs} runs")
         plt.legend()
         plt.xlabel("Generation")
         plt.grid()
