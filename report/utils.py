@@ -1,6 +1,7 @@
 from pathlib import Path
 import sys
 import numpy as np
+from typing import Tuple
 
 sys.path.append(str(Path(__file__).parent.parent / "tsp-genetic-py"))
 sys.path.append(str(Path(__file__).parent.parent / "run"))
@@ -21,7 +22,7 @@ def setup_matplotlib():
     matplotlib.rc("font", size=16)
 
 
-def get_color(plot):
+def _get_color(plot):
     return plot[0].get_color()
 
 
@@ -44,7 +45,7 @@ def plot_data(
         plt.subplot(1, 2, 1)
 
     colors = [
-        get_color(plt.plot(generations, data.fitness_mean, label=label))
+        _get_color(plt.plot(generations, data.fitness_mean, label=label))
         for data, label in zip(best_data, labels)
     ]
     if should_plot_std:
@@ -74,26 +75,51 @@ def plot_data(
         plt.xlabel("Generation")
         plt.grid()
 
-    plt.show()
-
 
 def run_optimizations(
-    n: int, problem: Problem, configuration: Configuration
+    n: int, problem: Problem, configuration: Configuration, mean=False
 ) -> DataStorage:
     datas = [DataStorage() for _ in range(n)]
     for data in datas:
         driver(problem, configuration, data)
-    best_matrix = np.vstack([data.fitness_best[None] for data in datas])
-    mean_matrix = np.vstack([data.fitness_mean[None] for data in datas])
 
-    n_generations = best_matrix.shape[1]
+    if mean:
+        matrix = np.vstack([data.fitness_mean[None] for data in datas])
+    else:
+        matrix = np.vstack([data.fitness_best[None] for data in datas])
 
-    collective_best = DataStorage()
+    n_generations = matrix.shape[1]
+
+    collective = DataStorage()
     for i in range(n_generations):
-        collective_best.log_inspection_message(i + 1, best_matrix[:, i], -1)
+        collective.log_inspection_message(i + 1, matrix[:, i], -1)
 
-    collective_mean = DataStorage()
-    for i in range(n_generations):
-        collective_mean.log_inspection_message(i + 1, mean_matrix[:, i], -1)
+    return collective
 
-    return collective_best, collective_mean
+
+def run_many_optimizations(
+    n: int, problem: Problem, configurations: Tuple[Configuration], mean=False
+):
+    return tuple(
+        run_optimizations(n=n, problem=problem, configuration=configuration, mean=mean)
+        for configuration in configurations
+    )
+
+
+def get_N_simulations():
+    return 20
+
+
+def plot_big_and_small(generations, data_small, data_big, labels):
+    setup_matplotlib()
+    N = get_N_simulations()
+
+    plt.figure(figsize=(20, 6))
+
+    plt.subplot(1, 2, 1)
+    plot_data(generations, labels, data_small, should_plot_std=False, n_runs=N)
+
+    plt.subplot(1, 2, 2)
+    plot_data(generations, labels, data_big, should_plot_std=False, n_runs=N)
+
+    plt.show()
