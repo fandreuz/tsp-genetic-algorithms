@@ -77,9 +77,9 @@ def plot_data(
 
 
 def run_optimizations(
-    n: int, problem: Problem, configuration: Configuration, mean=False
+    problem: Problem, configuration: Configuration, mean=False
 ) -> DataStorage:
-    datas = [DataStorage() for _ in range(n)]
+    datas = [DataStorage() for _ in range(get_N_simulations())]
     for data in datas:
         driver(problem, configuration, data)
 
@@ -98,10 +98,14 @@ def run_optimizations(
 
 
 def run_many_optimizations(
-    n: int, problem: Problem, configurations: Tuple[Configuration], mean=False
+    problem: Problem, configurations: Tuple[Configuration], mean=False
 ):
     return tuple(
-        run_optimizations(n=n, problem=problem, configuration=configuration, mean=mean)
+        run_optimizations(
+            problem=problem,
+            configuration=configuration,
+            mean=mean,
+        )
         for configuration in configurations
     )
 
