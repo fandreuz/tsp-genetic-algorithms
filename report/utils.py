@@ -111,7 +111,7 @@ def run_many_optimizations(
 
 
 def get_N_simulations():
-    return 20
+    return 1
 
 
 def plot_big_and_small(generations, data_small, data_big, labels):

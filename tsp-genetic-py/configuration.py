@@ -3,6 +3,7 @@ from enum import Enum
 from crossover import Crossover
 from mutation import Mutation
 import numpy as np
+from math import floor
 
 
 class CrossoverStrategy(Enum):
@@ -110,6 +111,8 @@ class Configuration:
             raise ValueError(f"Population size: {self.population_size} > 0")
         if self.elite_size < 0:
             raise ValueError(f"Elite size: {self.elite_size} >= 0")
+        if self.elite_size < 1:
+            self.elite_size = floor(self.elite_size * self.population_size)
         if self.elite_size >= self.population_size:
             raise ValueError(f"Elite size: {self.elite_size} < {self.population_size}")
         if self.n_generations <= 0:
