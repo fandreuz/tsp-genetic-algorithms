@@ -14,6 +14,7 @@ from idata_logger import IDataLogger
 class DataStorage(IDataLogger):
     def __init__(self):
         self._mutations = np.array([])
+        self._mutation_probability = np.array([])
         self._fitness_best = np.array([])
         self._fitness_worst = np.array([])
         self._fitness_mean = np.array([])
@@ -22,6 +23,10 @@ class DataStorage(IDataLogger):
     @property
     def mutations(self):
         return self._mutations
+
+    @property
+    def mutation_probability(self):
+        return self._mutation_probability
 
     @property
     def fitness_best(self):
@@ -44,9 +49,7 @@ class DataStorage(IDataLogger):
         pass
 
     @override
-    def log_inspection_message(
-        self, current_generation: int, fitness: np.ndarray, optimum: float
-    ):
+    def log_inspection_message(self, fitness: np.ndarray, optimum: float):
         self._fitness_best = np.concatenate((self._fitness_best, (np.min(fitness),)))
         self._fitness_worst = np.concatenate((self._fitness_worst, (np.max(fitness),)))
         self._fitness_mean = np.concatenate((self._fitness_mean, (np.mean(fitness),)))
@@ -56,4 +59,10 @@ class DataStorage(IDataLogger):
 
     @override
     def log_mutations(self, mutations_count):
-        self._mutations = mutations_count
+        self._mutations = np.concatenate((self._mutations, (mutations_count,)))
+
+    @override
+    def log_mutation_probability(self, mutations_probability):
+        self._mutation_probability = np.concatenate(
+            (self._mutation_probability, (mutations_probability,))
+        )

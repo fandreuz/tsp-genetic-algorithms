@@ -27,6 +27,9 @@ def _separator():
 
 
 class Printer(IDataLogger):
+    def __init__(self):
+        self._current_generation = 0
+
     @override
     def log_header(self):
         _print_no_newline(f"{'Generation'.ljust(_generation_pad)}")
@@ -40,10 +43,8 @@ class Printer(IDataLogger):
         print(f"{'Optimum/Min'.ljust(_stats_pad)}")
 
     @override
-    def log_inspection_message(
-        self, current_generation: int, fitness: np.ndarray, optimum: float
-    ):
-        _print_no_newline(_ljust(current_generation, cnt=_generation_pad))
+    def log_inspection_message(self, fitness: np.ndarray, optimum: float):
+        _print_no_newline(_ljust(self._current_generation, cnt=_generation_pad))
         _separator()
         _print_no_newline(_ljust(np.min(fitness), _stats_pad))
         _separator()
@@ -53,6 +54,12 @@ class Printer(IDataLogger):
         _separator()
         print(_ljust(optimum / np.min(fitness), _stats_pad))
 
+        self._current_generation += 1
+
     @override
     def log_mutations(self, mutations_count):
-        print(f"N. of mutations: {mutations_count}")
+        pass
+
+    @override
+    def log_mutation_probability(self, mutations_probability):
+        pass

@@ -131,9 +131,15 @@ def _mutate(
     configuration: Configuration,
     mutation_indexes_choice: np.ndarray,
     generation_count: int,
+    mutation_probability: float,
 ):
-    mp = configuration.compute_mutation_probability(generation_count)
-    mutations_bitmap = rnd.binomial(1, mp, configuration.population_size).astype(bool)
+    if mutation_probability is None:
+        mutation_probability = configuration.compute_mutation_probability(
+            generation_count
+        )
+    mutations_bitmap = rnd.binomial(
+        1, mutation_probability, configuration.population_size
+    ).astype(bool)
     n_mutations = np.sum(mutations_bitmap)
 
     rnd_per_mutation = (
@@ -149,7 +155,7 @@ def _mutate(
             next_population[population_idx], *swap_indices[idx]
         )
 
-    return n_mutations
+    return n_mutations, mutation_probability
 
 
 def driver(problem: Problem, configuration: Configuration, data_logger: IDataLogger):
@@ -166,12 +172,12 @@ def driver(problem: Problem, configuration: Configuration, data_logger: IDataLog
         data_logger.log_header()
 
     mutations_count = 0
+    adaptive_mutation_probability = None
 
     fitness = _compute_fitness(problem.cost_matrix, population)
     for current_generation in range(1, configuration.n_generations):
         if current_generation % configuration.print_every == 0:
             data_logger.log_inspection_message(
-                current_generation=current_generation,
                 fitness=fitness,
                 optimum=optimum,
             )
@@ -194,12 +200,15 @@ def driver(problem: Problem, configuration: Configuration, data_logger: IDataLog
             next_population=next_population,
         )
 
-        mutations_count += _mutate(
+        mutations_count, mutation_probability = _mutate(
             generation_count=current_generation,
             configuration=configuration,
             next_population=next_population,
             mutation_indexes_choice=mutation_indexes_choice,
+            mutation_probability=adaptive_mutation_probability,
         )
+        data_logger.log_mutations(mutations_count)
+        data_logger.log_mutation_probability(mutation_probability)
         next_fitness = _compute_fitness(problem.cost_matrix, next_population)
 
         if configuration.next_generation_policy == NextGenerationPolicy.REPLACE_ALL:
@@ -212,6 +221,14 @@ def driver(problem: Problem, configuration: Configuration, data_logger: IDataLog
 
             fitness = tot_fitness[keep]
             population = np.vstack((population, next_population))[keep]
+
+            if configuration.mutation_function_adaptive:
+                old_retained = np.count_nonzero(keep < configuration.population_size)
+                adaptive_mutation_probability = (
+                    configuration.mutation_probability
+                    * old_retained
+                    / configuration.population_size
+                )
         else:
             raise ValueError(
                 f"Unexpected policy: {configuration.next_generation_policy}"
@@ -220,12 +237,9 @@ def driver(problem: Problem, configuration: Configuration, data_logger: IDataLog
     current_generation = configuration.n_generations
     if current_generation % configuration.print_every == 0:
         data_logger.log_inspection_message(
-            current_generation=current_generation,
             fitness=fitness,
             optimum=optimum,
         )
-
-    data_logger.log_mutations(mutations_count)
 
     best = np.argmin(fitness)
     return population[best], fitness[best], optimum

@@ -68,6 +68,12 @@ parser.add_argument(
     default=0,
 )
 parser.add_argument(
+    "--mutation-function-adaptive",
+    type=bool,
+    help="Flag to enable adaptive mutation probability function",
+    default=False,
+)
+parser.add_argument(
     "-c",
     "--crossover",
     type=int,

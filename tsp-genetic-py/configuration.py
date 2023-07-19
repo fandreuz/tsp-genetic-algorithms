@@ -97,6 +97,7 @@ class Configuration:
     mutation_operator: Mutation
     mutation_probability: float
     mutation_function_degree: int
+    mutation_function_adaptive: bool
 
     crossover_operator: Crossover
     crossover_strategy: CrossoverStrategy
@@ -124,6 +125,10 @@ class Configuration:
         if self.mutation_function_degree < 0:
             raise ValueError(
                 f"Mutation function degree: {self.mutation_function_degree} >= 0"
+            )
+        if self.mutation_function_adaptive and self.mutation_function_degree != 0:
+            raise ValueError(
+                "mutation_function_adaptive=True is incompatible with non-zero mutation_function_degree"
             )
         if (
             self.next_generation_policy == NextGenerationPolicy.BEST
