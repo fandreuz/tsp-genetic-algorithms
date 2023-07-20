@@ -19,7 +19,7 @@ import matplotlib as mpl
 
 
 def get_N_simulations():
-    return 1
+    return 5
 
 
 def setup_matplotlib():
@@ -83,9 +83,10 @@ def plot_data(
     labels,
     best_data,
     mean_data=None,
-    should_plot_std=True,
+    should_plot_std=False,
     n_runs=None,
     data_operator=attrgetter("fitness_mean"),
+    title="Best",
 ):
     setup_matplotlib()
 
@@ -101,9 +102,9 @@ def plot_data(
             plot_std(generations=generations, data=data, color=color)
 
     if n_runs is None:
-        plt.title("Best")
+        plt.title(title)
     else:
-        plt.title(f"Best (mean of {n_runs} runs)")
+        plt.title(f"{title} (mean of {n_runs} runs)")
     plt.legend()
     plt.xlabel("Generation")
     plt.grid()
@@ -126,16 +127,13 @@ def plot_data(
 
 def plot_big_and_small(generations, data_small, data_big, labels, **kwargs):
     setup_matplotlib()
-    N = get_N_simulations()
 
     plt.figure(figsize=(20, 6))
 
     plt.subplot(1, 2, 1)
-    plot_data(
-        generations, labels, data_small, should_plot_std=False, n_runs=N, **kwargs
-    )
+    plot_data(generations, labels, data_small, **kwargs)
 
     plt.subplot(1, 2, 2)
-    plot_data(generations, labels, data_big, should_plot_std=False, n_runs=N, **kwargs)
+    plot_data(generations, labels, data_big, **kwargs)
 
     plt.show()
