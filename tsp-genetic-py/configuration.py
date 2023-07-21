@@ -98,6 +98,8 @@ class Configuration:
     mutation_probability: float
     mutation_function_degree: int
     mutation_function_adaptive: bool
+    mutation_function_oscillating_amplitude: float
+    mutation_function_oscillating_cycles: int
 
     crossover_operator: Crossover
     crossover_strategy: CrossoverStrategy
@@ -136,6 +138,14 @@ class Configuration:
         ):
             raise ValueError(
                 "elite_size > 0 is incompatible with NextGenerationPolicy.BEST"
+            )
+        if not 0 <= self.mutation_function_oscillating_amplitude <= 1:
+            raise ValueError(
+                f"Mutation function oscillating amplitude: 0 <= {self.mutation_function_oscillating_amplitude} <= 1"
+            )
+        if self.mutation_function_oscillating_cycles < 0:
+            raise ValueError(
+                f"Mutation function oscillating cycles: {self.mutation_function_oscillating_cycles} < 0"
             )
 
         if self.mutation_function_degree > 0:

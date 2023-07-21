@@ -74,6 +74,18 @@ parser.add_argument(
     default=False,
 )
 parser.add_argument(
+    "--mutation-function-oscillating-amplitude",
+    type=float,
+    help="Amplitude of the oscillating term",
+    default=0,
+)
+parser.add_argument(
+    "--mutation-function-oscillating-cycles",
+    type=int,
+    help="Number of cycles of the oscillating term during the run",
+    default=10,
+)
+parser.add_argument(
     "-c",
     "--crossover",
     type=int,
@@ -114,6 +126,9 @@ configuration = Configuration(
     mutation_operator=Mutation(args.mutation_operator),
     mutation_probability=args.mutation_probability,
     mutation_function_degree=args.mutation_function_degree,
+    mutation_function_adaptive=args.mutation_function_adaptive,
+    mutation_function_oscillating_amplitude=args.mutation_function_oscillating_amplitude,
+    mutation_function_oscillating_cycles=args.mutation_function_oscillating_cycles,
     print_every=args.print_every,
 )
 print(f"Configuration: {configuration}")

@@ -172,7 +172,13 @@ def driver(problem: Problem, configuration: Configuration, data_logger: IDataLog
         data_logger.log_header()
 
     mutations_count = 0
-    adaptive_mutation_probability = None
+    adaptive_mutation_probability = configuration.mutation_probability
+    oscillating_mutation_probability = 0
+    oscillating_term_coefficient = (
+        2 * np.pi
+        * configuration.mutation_function_oscillating_cycles
+        / configuration.n_generations
+    )
 
     fitness = _compute_fitness(problem.cost_matrix, population)
     for current_generation in range(1, configuration.n_generations):
@@ -205,7 +211,9 @@ def driver(problem: Problem, configuration: Configuration, data_logger: IDataLog
             configuration=configuration,
             next_population=next_population,
             mutation_indexes_choice=mutation_indexes_choice,
-            mutation_probability=adaptive_mutation_probability,
+            mutation_probability=np.clip(
+                adaptive_mutation_probability + oscillating_mutation_probability, 0, 1
+            ),
         )
         data_logger.log_mutations(mutations_count)
         data_logger.log_mutation_probability(mutation_probability)
@@ -233,6 +241,11 @@ def driver(problem: Problem, configuration: Configuration, data_logger: IDataLog
             raise ValueError(
                 f"Unexpected policy: {configuration.next_generation_policy}"
             )
+
+        oscillating_mutation_probability = (
+            np.sin(oscillating_term_coefficient * current_generation)
+            * configuration.mutation_function_oscillating_amplitude
+        )
 
     current_generation = configuration.n_generations
     if current_generation % configuration.print_every == 0:
