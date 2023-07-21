@@ -44,7 +44,7 @@ def plot_std(generations, data, color):
 def run_optimizations(
     problem: Problem, configuration: Configuration, mean=False
 ) -> DataStorage:
-    datas = [DataStorage() for _ in range(get_N_simulations())]
+    datas = tuple(DataStorage() for _ in range(get_N_simulations()))
     for data in datas:
         driver(problem, configuration, data)
 
@@ -53,12 +53,11 @@ def run_optimizations(
     else:
         matrix = np.vstack([data.fitness_best[None] for data in datas])
 
-    n_generations = matrix.shape[1]
-
     collective = DataStorage()
-    for i in range(n_generations):
+    for i in range(matrix.shape[1]):
         collective.log_inspection_message(matrix[:, i], -1)
 
+    for i in range(len(datas[0].mutation_probability)):
         collective.log_mutations(datas[0].mutations[i])
         collective.log_mutation_probability(datas[0].mutation_probability[i])
 
