@@ -19,7 +19,7 @@ import matplotlib as mpl
 
 
 def get_N_simulations():
-    return 5
+    return 25
 
 
 def setup_matplotlib():
