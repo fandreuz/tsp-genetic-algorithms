@@ -69,9 +69,8 @@ parser.add_argument(
 )
 parser.add_argument(
     "--mutation-function-adaptive",
-    type=bool,
     help="Flag to enable adaptive mutation probability function",
-    default=False,
+    action="store_true",
 )
 parser.add_argument(
     "--mutation-function-oscillating-amplitude",
