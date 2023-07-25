@@ -13,9 +13,19 @@ Solving Traveling Salesman Problem (TSP) via Genetic Algorithms (GAs).
 
 ### Tools
 
-- argparse
-- matplotlib
+- Argparse
+- Matplotlib
 - Jupyter notebook
+
+## Some results
+
+### Comparison of performance for several crossover operators
+
+![image](https://github.com/fandreuz/tsp-genetic-algorithms/assets/8464342/1d309743-3743-4775-b3fc-59a6f4b31beb)
+
+### Mutation probability behavior with adaptive control
+
+![image](https://github.com/fandreuz/tsp-genetic-algorithms/assets/8464342/ebb8f3f8-0434-4d1c-83ae-2cdc06a21a91)
 
 ### References
 
